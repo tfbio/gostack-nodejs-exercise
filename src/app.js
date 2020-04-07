@@ -1,7 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-
-// const { uuid } = require("uuidv4");
+const { uuid } = require("uuidv4");
 
 const app = express();
 
@@ -11,19 +10,47 @@ app.use(cors());
 const repositories = [];
 
 app.get("/repositories", (request, response) => {
-  // TODO
+  return response.json(repositories);
 });
 
 app.post("/repositories", (request, response) => {
-  // TODO
+  const id = uuid(); let likes = 0;
+  
+  const {title, url, techs} = request.body;
+  
+  repositories.push({
+    id,
+    title,
+    url,
+    techs,
+    likes
+  });
+  return response.json({ id });
 });
 
 app.put("/repositories/:id", (request, response) => {
-  // TODO
+  
 });
 
-app.delete("/repositories/:id", (req, res) => {
-  // TODO
+app.delete("/repositories/:id", (request, response) => {
+  const id = request.params;
+  let indexToDelete;
+
+  for(let i=0; i < repositories.length; i++){
+    if(repositories[i][id] === id){
+      indexToDelete = i;
+    }
+    
+    indexToDelete = -1;
+  }
+
+  if(indexToDelete === -1){
+    return response.status(400).json({ error: 'user does not exists',indexToDelete })
+  }
+  else{
+    repositories.splice(indexToDelete, 1);
+    return response.json({id,indexToDelete});
+  }
 });
 
 app.post("/repositories/:id/like", (request, response) => {
