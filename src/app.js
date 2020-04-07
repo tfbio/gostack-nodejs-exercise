@@ -13,39 +13,48 @@ app.get("/repositories", (request, response) => {
   return response.json(repositories);
 });
 
+
+
 app.post("/repositories", (request, response) => {
-  const id = uuid(); let likes = 0;
-  
+  const id = uuid();
   const { title, url, techs } = request.body;
   
-  repositories.push({
+  const newRepo = ({
     id,
     title,
     url,
     techs,
-    likes
+    likes: 0
   });
-  return response.json({ id });
+
+  repositories.push(newRepo)
+  return response.json(newRepo);
 });
+
+
+
 
 app.put("/repositories/:id", (request, response) => {
   const { id } = request.params;
-  const { title, url, techs } = request.body;
-  let indexToChange;
+  const {title, url, techs} = request.body;
+  let indexToUpdate = repositories.findIndex((repoSearch)=>repoSearch.id === id );
 
-  indexToChange = repositories.findIndex((repoSearch) => repoSearch.id === id);
-  if(indexToChange === -1){
-    return response.status(400).json({error: 'user does not exists'});
+  if(indexToUpdate === -1){
+    return response.status(400).json({error: 'Repository does not exists'});
   }
   else{
-    repositories[indexToChange].title = title;
-    repositories[indexToChange].url = url;
-    repositories[indexToChange].techs = techs; 
-
-    return response.status(200).send('repository updated');    
-  }
-
+    const updateRepo = {
+      id,
+      title,
+      url,
+      techs,
+      likes: repositories[indexToUpdate].likes
+    }
+  return response.status(200).json(updateRepo);}
 });
+
+
+
 
 app.delete("/repositories/:id", (request, response) => {
   const { id } = request.params;
@@ -54,13 +63,16 @@ app.delete("/repositories/:id", (request, response) => {
   indexToDelete = repositories.findIndex((repoSearch)=>repoSearch.id === id);
 
   if(indexToDelete === -1){
-    return response.status(400).json({ error: 'user does not exists',indexToDelete })
+    return response.status(400).json({ error: 'Repository does not exists' })
   }
   else{
     repositories.splice(indexToDelete, 1);
-    return response.status(200).send('repository deleted');
+    return response.status(204);
   }
 });
+
+
+
 
 app.post("/repositories/:id/like", (request, response) => {
   const { id } = request.params;
@@ -68,11 +80,11 @@ app.post("/repositories/:id/like", (request, response) => {
 
   indexToLike = repositories.findIndex((repoSearch)=>repoSearch.id === id);
   if(indexToLike === -1){
-    return response.status(400).send('user does not exists');
+    return response.status(400).json({ error: 'Repository does not exists' });
   }
   else{
     repositories[indexToLike].likes++;
-    return response.status(200).send('repository liked');
+    return response.status(200).json(repositories[indexToLike].likes);
   }
 });
 
