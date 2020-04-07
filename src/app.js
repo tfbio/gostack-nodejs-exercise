@@ -16,7 +16,7 @@ app.get("/repositories", (request, response) => {
 app.post("/repositories", (request, response) => {
   const id = uuid(); let likes = 0;
   
-  const {title, url, techs} = request.body;
+  const { title, url, techs } = request.body;
   
   repositories.push({
     id,
@@ -29,8 +29,8 @@ app.post("/repositories", (request, response) => {
 });
 
 app.put("/repositories/:id", (request, response) => {
-  const id = request.params;
-  const {title, url, techs} = request.body;
+  const { id } = request.params;
+  const { title, url, techs } = request.body;
   let indexToChange;
 
   indexToChange = repositories.findIndex((repoSearch) => repoSearch.id === id);
@@ -42,7 +42,7 @@ app.put("/repositories/:id", (request, response) => {
     repositories[indexToChange].url = url;
     repositories[indexToChange].techs = techs; 
 
-    return response.send('repository updated');    
+    return response.status(200).send('repository updated');    
   }
 
 });
@@ -58,12 +58,22 @@ app.delete("/repositories/:id", (request, response) => {
   }
   else{
     repositories.splice(indexToDelete, 1);
-    return response.json({id,indexToDelete});
+    return response.status(200).send('repository deleted');
   }
 });
 
 app.post("/repositories/:id/like", (request, response) => {
-  
+  const { id } = request.params;
+  let indexToLike;
+
+  indexToLike = repositories.findIndex((repoSearch)=>repoSearch.id === id);
+  if(indexToLike === -1){
+    return response.status(400).send('user does not exists');
+  }
+  else{
+    repositories[indexToLike].likes++;
+    return response.status(200).send('repository liked');
+  }
 });
 
 module.exports = app;
