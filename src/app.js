@@ -29,20 +29,29 @@ app.post("/repositories", (request, response) => {
 });
 
 app.put("/repositories/:id", (request, response) => {
-  
+  const id = request.params;
+  const {title, url, techs} = request.body;
+  let indexToChange;
+
+  indexToChange = repositories.findIndex((repoSearch) => repoSearch.id === id);
+  if(indexToChange === -1){
+    return response.status(400).json({error: 'user does not exists'});
+  }
+  else{
+    repositories[indexToChange].title = title;
+    repositories[indexToChange].url = url;
+    repositories[indexToChange].techs = techs; 
+
+    return response.send('repository updated');    
+  }
+
 });
 
 app.delete("/repositories/:id", (request, response) => {
-  const id = request.params;
+  const { id } = request.params;
   let indexToDelete;
 
-  for(let i=0; i < repositories.length; i++){
-    if(repositories[i][id] === id){
-      indexToDelete = i;
-    }
-    
-    indexToDelete = -1;
-  }
+  indexToDelete = repositories.findIndex((repoSearch)=>repoSearch.id === id);
 
   if(indexToDelete === -1){
     return response.status(400).json({ error: 'user does not exists',indexToDelete })
@@ -54,7 +63,7 @@ app.delete("/repositories/:id", (request, response) => {
 });
 
 app.post("/repositories/:id/like", (request, response) => {
-  // TODO
+  
 });
 
 module.exports = app;
