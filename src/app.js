@@ -50,7 +50,10 @@ app.put("/repositories/:id", (request, response) => {
       techs,
       likes: repositories[indexToUpdate].likes
     }
-  return response.status(200).json(updateRepo);}
+
+    repositories[indexToUpdate] = updateRepo;
+    return response.status(200).json(repositories[indexToUpdate]);
+  }
 });
 
 
@@ -58,9 +61,8 @@ app.put("/repositories/:id", (request, response) => {
 
 app.delete("/repositories/:id", (request, response) => {
   const { id } = request.params;
-  let indexToDelete;
 
-  indexToDelete = repositories.findIndex((repoSearch)=>repoSearch.id === id);
+  const indexToDelete = repositories.findIndex((repoSearch)=>repoSearch.id === id);
 
   if(indexToDelete === -1){
     return response.status(400).json({ error: 'Repository does not exists' })
@@ -73,18 +75,17 @@ app.delete("/repositories/:id", (request, response) => {
 
 
 
-
 app.post("/repositories/:id/like", (request, response) => {
   const { id } = request.params;
-  let indexToLike;
+  
+  const indexToLike = repositories.findIndex((repoSearch)=>repoSearch.id === id);
 
-  indexToLike = repositories.findIndex((repoSearch)=>repoSearch.id === id);
   if(indexToLike === -1){
     return response.status(400).json({ error: 'Repository does not exists' });
   }
   else{
-    repositories[indexToLike].likes++;
-    return response.status(200).json(repositories[indexToLike].likes);
+    repositories[indexToLike].likes += 1;
+    return response.status(200).json(repositories[indexToLike]);
   }
 });
 
